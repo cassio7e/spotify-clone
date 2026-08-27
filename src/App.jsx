@@ -1,122 +1,112 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useRef } from 'react';
+import './App.css';
+
+const TRACKS = [
+  {
+    id: 1,
+    title: "Synthwave Pulse",
+    artist: "Electronic Beats",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  },
+  {
+    id: 2,
+    title: "Chill Horizon",
+    artist: "Lofi Dreamer",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  },
+  {
+    id: 3,
+    title: "Deep Focus",
+    artist: "Ambient Sound",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+  }
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentTrack, setCurrentTrack] = useState(TRACKS[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const playTrack = (track) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
+    // On attend le prochain tick pour charger et lancer la nouvelle musique
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+    }, 100);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="spotify-container">
+      <div className="spotify-body">
+        {/* Barre latérale */}
+        <div className="sidebar">
+          <h2>Spotify Clone</h2>
+          <ul>
+            <li>🏠 Accueil</li>
+            <li>🔍 Rechercher</li>
+            <li>📚 Bibliothèque</li>
+          </ul>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+
+        {/* Contenu principal */}
+        <div className="main-content">
+          <h1>Bonne écoute</h1>
+          
+          <div className="song-list">
+            {TRACKS.map((track) => (
+              <div 
+                key={track.id} 
+                className="song-card" 
+                onClick={() => playTrack(track)}
+              >
+                <div className="song-info">
+                  <h4>{track.title}</h4>
+                  <p>{track.artist}</p>
+                </div>
+                <button className="play-btn">▶</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Lecteur du bas */}
+      <div className="player">
+        <div className="player-track-info">
+          <strong>{currentTrack ? currentTrack.title : "Aucun titre"}</strong>
+          <p style={{ color: "#b3b3b3", fontSize: "0.8rem" }}>
+            {currentTrack ? currentTrack.artist : ""}
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* Élément HTML5 Audio caché piloté par React */}
+        <audio ref={audioRef} src={currentTrack?.url} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="player-controls">
+          <button onClick={togglePlay}>
+            {isPlaying ? "⏸" : "▶"}
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        
+        <div>🔊 Volume</div>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
